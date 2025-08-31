@@ -1,29 +1,27 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Customnavbar from "./components/Customnavbar";
 import Home from "./components/Home";
-import Login from "./components/Login";
-import SignUp from "./components/Signup";
+import Signup from "./components/auth/Signup";
+import Login from "./components/auth/Login";
+import UserDashboard from "./components/dashboard/UserDashboard";
+import AdminDashboard from "./components/dashboard/AdminDashboard";
 
-function App() {
-  // page state: "home" | "login" | "signup"
-  const [page, setPage] = useState("home");
-
+const App = () => {
   return (
-    <>
-      {/* Navbar with buttons to switch pages */}
-      <Customnavbar
-        onLoginClick={() => setPage("login")}
-        onSignUpClick={() => setPage("signup")}
-        onHomeClick={() => setPage("home")}
-      />
-
+    <BrowserRouter>
+      <Customnavbar />
       <div className="container-fluid p-0">
-        {page === "home" && <Home />}
-        {page === "login" && <Login onSignUpLinkClick={() => setPage("signup")} />}
-        {page === "signup" && <SignUp />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        </Routes>
       </div>
-    </>
+    </BrowserRouter>
   );
 }
 
 export default App;
+

@@ -4,9 +4,10 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { Link, useNavigate } from 'react-router-dom';
 import { USER_ENDPOINT } from "../../assets/utils";
 
-function Signup() {
+const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,6 +18,8 @@ function Signup() {
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,6 +67,7 @@ function Signup() {
         setSuccess(true);
         setErrors({});
         console.log("Signup Success:", data);
+        navigate("/login");
       } else {
         setSuccess(false);
         setErrors({ apiError: data.message || "Signup failed" });
@@ -158,6 +162,40 @@ function Signup() {
             </Col>
           </Form.Group>
 
+          <Form.Group as={Row} className="mb-3" controlId="formRole">
+            <Form.Label column sm={4}>
+              Role
+            </Form.Label>
+            <Col sm={8}>
+              <div className="d-flex">
+                <Form.Check
+                  type="radio"
+                  label="User"
+                  name="role"
+                  value="user"
+                  checked={formData.role === "user"}
+                  onChange={handleChange}
+                  isInvalid={!!errors.role}
+                  className="me-3"
+                />
+                <Form.Check
+                  type="radio"
+                  label="Admin"
+                  name="role"
+                  value="admin"
+                  checked={formData.role === "admin"}
+                  onChange={handleChange}
+                  isInvalid={!!errors.role}
+                />
+              </div>
+              {errors.role && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.role}
+                </Form.Control.Feedback>
+              )}
+            </Col>
+          </Form.Group>
+
           <div className="d-flex justify-content-between">
             <Button variant="success" type="submit">
               Sign Up
@@ -166,7 +204,7 @@ function Signup() {
               variant="secondary"
               type="reset"
               onClick={() =>
-                setFormData({ name: "", email: "", password: "", confirmPassword: "" })
+                setFormData({ name: "", email: "", password: "", confirmPassword: "", role: "" })
               }
             >
               Reset

@@ -4,11 +4,15 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { USER_ENDPOINT } from "../../assets/utils";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+const Login = () => {
+  const [formData, setFormData] = useState({ email: "", password: "", role: "" });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,20 +26,47 @@ function Login() {
     if (!formData.password) newErrors.password = "Password is required";
     else if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
+    if (!formData.role) newErrors.role = "Role is required";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setSuccess(false);
     } else {
-      setErrors({});
-      setSuccess(true);
-      console.log("Login Data:", formData);
+      try {
+      const res = await fetch(`${USER_ENDPOINT}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSuccess(false);
+        setErrors({ apiError: data.message || "Signup failed" });
+        console.error("Signup Error:", data);
+      } else {
+        // Save token in localStorage/sessionStorage
+        setSuccess(true);
+        setErrors({});
+        localStorage.setItem("token", data.token);
+        console.log("Signup Success:", data);
+        navigate("/");
+
+        // Redirect user
+       // navigate("/dashboard");
+      }
+    } catch (error) {
+      setSuccess(false);
+      setErrors({ apiError: "Server error. Try again later." });
+      console.error("Error:", error);
     }
+  }
   };
 
   return (
@@ -79,6 +110,39 @@ function Login() {
               <Form.Control.Feedback type="invalid">
                 {errors.password}
               </Form.Control.Feedback>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="mb-3" controlId="formRole">
+            <Form.Label column sm={4}>
+              Role
+            </Form.Label>
+            <Col sm={8}>
+              <div className="d-flex">
+                <Form.Check
+                  type="radio"
+                  label="User"
+                  name="role"
+                  value="user"
+                  checked={formData.role === "user"}
+                  onChange={handleChange}
+                  isInvalid={!!errors.role}
+                  className="me-3"
+                />
+                <Form.Check
+                  type="radio"
+                  label="Admin"
+                  name="role"
+                  value="admin"
+                  checked={formData.role === "admin"}
+                  onChange={handleChange}
+                  isInvalid={!!errors.role}
+                />
+              </div>
+              {errors.role && (
+                <Form.Control.Feedback type="invalid">
+                  {errors.role}
+                </Form.Control.Feedback>
+              )}
             </Col>
           </Form.Group>
 

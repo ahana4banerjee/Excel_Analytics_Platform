@@ -2,19 +2,20 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
 
-function Customnavbar({ onLoginClick, onSignUpClick, onHomeClick }) {
+const Customnavbar = () => {
   return (
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
       <Container>
-        <Navbar.Brand onClick={onHomeClick} style={{ cursor: "pointer" }}>
-          Excel Analytics
+        <Navbar.Brand style={{ cursor: "pointer"}}>
+          <Link to ="/" style= {{textDecoration: "none", color: "inherit" }}>Excel Analytics</Link>
         </Navbar.Brand>
         <Nav className="ms-auto">
-          <Button variant="outline-light" className="me-2" onClick={onLoginClick}>
+          <Button as={Link} to="/login" variant="outline-light" className="me-2">
             Login
           </Button>
-          <Button variant="warning" onClick={onSignUpClick}>
+          <Button as={Link} to="/signup" variant="warning">
             Sign Up
           </Button>
         </Nav>
