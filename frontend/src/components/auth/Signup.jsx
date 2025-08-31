@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { USER_ENDPOINT } from "../../assets/utils";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -31,21 +33,50 @@ function Signup() {
       newErrors.password = "Password must be at least 6 characters";
     if (formData.confirmPassword !== formData.password)
       newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.role) newErrors.role = "Role is required";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    setSuccess(false);
+  } else {
+    try {
+      const response = await fetch(`${USER_ENDPOINT}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role, 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setErrors({});
+        console.log("Signup Success:", data);
+      } else {
+        setSuccess(false);
+        setErrors({ apiError: data.message || "Signup failed" });
+        console.error("Signup Error:", data);
+      }
+    } catch (error) {
       setSuccess(false);
-    } else {
-      setErrors({});
-      setSuccess(true);
-      console.log("Signup Data:", formData);
+      setErrors({ apiError: "Server error. Try again later." });
+      console.error("Error:", error);
     }
-  };
+  }
+};
+
 
   return (
     <div className="auth-page">
