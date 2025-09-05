@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import userRoute from "./routes/auth.js";
+import userRoute from "./routes/userRoutes.js";
+import fileRoute from "./routes/fileRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
   res.send("Backend Running");
 });
 app.use('/user', userRoute);
+app.use('/file', fileRoute);
 
 const PORT = 5000;
 app.listen(PORT, ()=>{

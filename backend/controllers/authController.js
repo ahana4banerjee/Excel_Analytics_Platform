@@ -3,9 +3,7 @@ import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
 
-const router = express.Router();
-
-router.post('/register', async (req, res) => {
+export const register = async (req, res) => {
     try{
         const { name, email, password, role } = req.body;
          
@@ -37,9 +35,9 @@ router.post('/register', async (req, res) => {
     catch(error){
         res.status(500).json({ message: "Server error" });
     }
-});
+};
 
-router.post('/login', async (req, res) => {
+export const login = async (req, res) => {
     
     try{
         const { email, password, role } = req.body;
@@ -77,6 +75,7 @@ router.post('/login', async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            token,
         }
 
         return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
@@ -89,6 +88,4 @@ router.post('/login', async (req, res) => {
         console.log(error)
         res.status(500).json({ message: "Server error" });
     }
-});
-
-export default router;
+};
